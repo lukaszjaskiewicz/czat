@@ -1,0 +1,63 @@
+K=klient
+S=serwer
+-> wys³anie wiadomoœci od strony po lewej do strony po prawej
+
+protokó³ przy rejestracji przyjmuje tylko znaki o wartoœciach w tablicy ASCII z przedzia³u od 33 do 122 w³¹cznie 
+protokó³ obs³uguje komendy REGISTER, LOGIN, LIST, JOIN, SEND, DISCONNECT nale¿y u¿yæ jednego z tych s³ów jako rozpoczynaj¹ce wiadomoœæ do serwera
+w przypadku nie wys³ania ¿adnej z wymienionych komend jako s³owa rozpoczynaj¹cego wiadomoœæ serwer zwróci b³¹d o wiadomoœci:
+5 ERROR niepoprawna komenda 
+oznacza to ¿e serwer nie wie co klient chce od serwera
+gdy u¿yjemy wielu komend w jednej wiadomoœci serwer rozpatrzy jako komendê tylko tê która rozpoczyna wiadomoœæ, kolejne zostan¹ rozpatrzone jako argumenty lub po prostu zostan¹ zignorowane
+jeœli uzyskamy odpowiedŸ od serwera:
+0 OK
+to znaczy ¿e wszystko dzia³a tak jak nale¿y
+
+REGISTER wymaga 2 argumentów oddzielonych spacj¹ loginu i has³a. pozwala siê zarejestrowaæ
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	REGISTER <nazwa_uzytkownika> <haslo> 
+
+S->K	0 OK
+	1 ERROR nazwa_uzytkownika zajeta
+	6 ERROR niepoprawny format loginu
+	7 ERROR nipoprawny format hasla
+b³¹d 1 oznacza ¿e wybrana nazwa u¿ytkownika jest ju¿ zajêta i trzeba wybraæ inn¹
+b³¹d 6 oznacza ¿e format loginu jest niepoprawny. login musi miec przynajmniej 3 znaki o wartoœciach w tablicy ASCII zakresu od 33 do 122 w³¹cznie
+b³¹d 7 oznacza ¿e format has³a jest niepoprawny. has³o musi miec przynajmniej 5 znaki o wartoœciach w tablicy ASCII zakresu od 33 do 122 w³¹cznie
+je¿eli 
+LOGIN wymaga 2 argumentów oddzielonych spacj¹ loginu i has³a. pozwala siê zalogowaæ
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	LOGIN <nazwa_uzytkownika> <haslo>
+
+S->K	0 OK
+	2 ERROR niepoprawne dane logowania 
+b³¹d 2 oznacza ¿e dane logowania s¹ niepoprawne. mo¿liwe jest ¿e dany login nie zosta³ zarejestrowany lub podane has³o jest b³êdne w porównaniu z zapisanym dla tego konta w bazie danych
+
+LIST nie wymaga ¿adnych dodatków. pozwala wyœwietliæ listê pokojów do których mo¿emy do³¹czyæ
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	LIST
+
+S->K	0 OK <nazwa_pokoju1> <nazwa_pokoju2> <nazwa_pokoju3> <nazwa_pokoju4> <nazwa_pokoju5>
+
+JOIN wymaga jednego argumentu nazwy pokoju. pozwala do³¹czyæ dowybranego pokoju
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	JOIN <nazwa_pokoju>
+
+S->K	0 OK
+	3 ERROR nipoprawna nazwa pokoju
+b³¹d 3 oznacza ¿e podana nazwa pokoju nie istnieje. trzeba uwa¿aæ na wielkie litery 
+
+SEND wymaga wiadomoœci o d³ugoœci>0. pozwala wys³aæ wiadomoœæ do wszystkich klientów w tym samym pokoju
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	SEND <wiadomosc>
+
+S->K	0 OK
+	4 ERROR nie jestes w zadnym pokoju
+	8 ERROR dlugosc wiadomosci jest rowna 0 
+b³¹d 4 oznacza ¿e nie do³¹czy³eœ jeszcze do ¿adnego pokoju i z tego powodu nie mo¿esz wysy³aæ wiadomoœci 
+b³¹d 8 oznacza ¿e wys³a³eœ tylko SEND bez ¿adnej wiadomoœci. musisz dodac przynajmniej jeden znak
+
+DISCONNECT nie wymaga ¿adnych dodatków. pozwala roz³¹czyæ siê z serwerem
+przyklad z mo¿liwymi odpowiedziami serwera:
+K->S	DISCONNECT
+
+S->K	0 OK\r\n
